@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package ride;
+
+option go_package = "./";
+
+service RideService {
+  rpc CreateRide (CreateRideRequest) returns (CreateRideResponse);
+  rpc GetRideStatus (RideStatusRequest) returns (RideStatusResponse);
+  rpc AssignDriver (AssignDriverRequest) returns (AssignDriverResponse);
+  rpc UpdateRideStatus (RideStatusUpdateRequest) returns (RideStatusUpdateResponse);
+  rpc CompleteRide (CompleteRideRequest) returns (CompleteRideResponse);
+}
+
+message CreateRideRequest {
+  string passenger_id = 1;
+  string pickup_location = 2;
+  string dropoff_location = 3;
+}
+
+message CreateRideResponse {
+  string ride_id = 1;
+  string status = 2;
+}
+
+message RideStatusRequest {
+  string ride_id = 1;
+}
+
+message RideStatusResponse {
+  string status = 1;
+}
+
+message AssignDriverRequest {
+  string ride_id = 1;
+}
+
+message AssignDriverResponse {
+  string driver_id = 1;
+  string status = 2;
+}
+
+message RideStatusUpdateRequest {
+  string ride_id = 1;
+  string new_status = 2;
+}
+
+message RideStatusUpdateResponse {
+  string status = 1;
+}
+
+message CompleteRideRequest {
+  string ride_id = 1;
+}
+
+message CompleteRideResponse {
+  string status = 1;
+}

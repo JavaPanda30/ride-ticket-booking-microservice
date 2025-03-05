@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package driver;
+
+option go_package = "./";
+
+service DriverService {
+  rpc GetAvailableDrivers (DriverRequest) returns (DriverResponse);
+  rpc UpdateDriverStatus (DriverStatusRequest) returns (DriverStatusResponse);
+}
+
+message DriverRequest {}
+
+message DriverResponse {
+  repeated string driver_ids = 1;
+}
+
+message DriverStatusRequest {
+  string driver_id = 1;
+  string status = 2;  // Available, On Trip, Offline
+}
+
+message DriverStatusResponse {
+  string message = 1;
+}

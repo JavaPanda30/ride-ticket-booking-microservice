@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package passenger;
+
+option go_package = "./";
+
+service PassengerService {
+  rpc RequestRide (RideRequest) returns (RideResponse);
+  rpc GetRideStatus (RideStatusRequest) returns (RideStatusResponse);
+}
+
+message RideRequest {
+  string passenger_id = 1;
+  string pickup_location = 2;
+  string dropoff_location = 3;
+}
+
+message RideResponse {
+  string ride_id = 1;
+  string status = 2;
+}
+
+message RideStatusRequest {
+  string ride_id = 1;
+}
+
+message RideStatusResponse {
+  string status = 1;
+}
