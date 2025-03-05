@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.20.3
-// source: passenger.proto
+// source: proto/passenger.proto
 
-package __
+package passenger
 
 import (
 	context "context"
@@ -19,16 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PassengerService_RequestRide_FullMethodName   = "/passenger.PassengerService/RequestRide"
-	PassengerService_GetRideStatus_FullMethodName = "/passenger.PassengerService/GetRideStatus"
+	PassengerService_RequestRide_FullMethodName = "/passenger.PassengerService/RequestRide"
 )
 
 // PassengerServiceClient is the client API for PassengerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PassengerServiceClient interface {
-	RequestRide(ctx context.Context, in *RideRequest, opts ...grpc.CallOption) (*RideResponse, error)
-	GetRideStatus(ctx context.Context, in *RideStatusRequest, opts ...grpc.CallOption) (*RideStatusResponse, error)
+	RequestRide(ctx context.Context, in *PassengerRideRequest, opts ...grpc.CallOption) (*RideResponse, error)
 }
 
 type passengerServiceClient struct {
@@ -39,20 +37,10 @@ func NewPassengerServiceClient(cc grpc.ClientConnInterface) PassengerServiceClie
 	return &passengerServiceClient{cc}
 }
 
-func (c *passengerServiceClient) RequestRide(ctx context.Context, in *RideRequest, opts ...grpc.CallOption) (*RideResponse, error) {
+func (c *passengerServiceClient) RequestRide(ctx context.Context, in *PassengerRideRequest, opts ...grpc.CallOption) (*RideResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RideResponse)
 	err := c.cc.Invoke(ctx, PassengerService_RequestRide_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *passengerServiceClient) GetRideStatus(ctx context.Context, in *RideStatusRequest, opts ...grpc.CallOption) (*RideStatusResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RideStatusResponse)
-	err := c.cc.Invoke(ctx, PassengerService_GetRideStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +51,7 @@ func (c *passengerServiceClient) GetRideStatus(ctx context.Context, in *RideStat
 // All implementations must embed UnimplementedPassengerServiceServer
 // for forward compatibility.
 type PassengerServiceServer interface {
-	RequestRide(context.Context, *RideRequest) (*RideResponse, error)
-	GetRideStatus(context.Context, *RideStatusRequest) (*RideStatusResponse, error)
+	RequestRide(context.Context, *PassengerRideRequest) (*RideResponse, error)
 	mustEmbedUnimplementedPassengerServiceServer()
 }
 
@@ -75,11 +62,8 @@ type PassengerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPassengerServiceServer struct{}
 
-func (UnimplementedPassengerServiceServer) RequestRide(context.Context, *RideRequest) (*RideResponse, error) {
+func (UnimplementedPassengerServiceServer) RequestRide(context.Context, *PassengerRideRequest) (*RideResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestRide not implemented")
-}
-func (UnimplementedPassengerServiceServer) GetRideStatus(context.Context, *RideStatusRequest) (*RideStatusResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRideStatus not implemented")
 }
 func (UnimplementedPassengerServiceServer) mustEmbedUnimplementedPassengerServiceServer() {}
 func (UnimplementedPassengerServiceServer) testEmbeddedByValue()                          {}
@@ -103,7 +87,7 @@ func RegisterPassengerServiceServer(s grpc.ServiceRegistrar, srv PassengerServic
 }
 
 func _PassengerService_RequestRide_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RideRequest)
+	in := new(PassengerRideRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,25 +99,7 @@ func _PassengerService_RequestRide_Handler(srv interface{}, ctx context.Context,
 		FullMethod: PassengerService_RequestRide_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassengerServiceServer).RequestRide(ctx, req.(*RideRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PassengerService_GetRideStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RideStatusRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PassengerServiceServer).GetRideStatus(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PassengerService_GetRideStatus_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassengerServiceServer).GetRideStatus(ctx, req.(*RideStatusRequest))
+		return srv.(PassengerServiceServer).RequestRide(ctx, req.(*PassengerRideRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -149,11 +115,7 @@ var PassengerService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "RequestRide",
 			Handler:    _PassengerService_RequestRide_Handler,
 		},
-		{
-			MethodName: "GetRideStatus",
-			Handler:    _PassengerService_GetRideStatus_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "passenger.proto",
+	Metadata: "proto/passenger.proto",
 }

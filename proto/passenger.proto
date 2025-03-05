@@ -2,28 +2,18 @@ syntax = "proto3";
 
 package passenger;
 
-option go_package = "./";
+option go_package = "Go-microservices/proto/passenger";
 
 service PassengerService {
-  rpc RequestRide (RideRequest) returns (RideResponse);
-  rpc GetRideStatus (RideStatusRequest) returns (RideStatusResponse);
+    rpc RequestRide (PassengerRideRequest) returns (RideResponse);
 }
 
-message RideRequest {
-  string passenger_id = 1;
-  string pickup_location = 2;
-  string dropoff_location = 3;
+message PassengerRideRequest {
+    string passenger_id = 1;
+    string location = 2;
 }
 
 message RideResponse {
-  string ride_id = 1;
-  string status = 2;
-}
-
-message RideStatusRequest {
-  string ride_id = 1;
-}
-
-message RideStatusResponse {
-  string status = 1;
+    string ride_id = 1;
+    bool success = 2;
 }

@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.20.3
-// source: driver.proto
+// source: proto/driver.proto
 
-package __
+package driver
 
 import (
 	context "context"
@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DriverServiceClient interface {
-	GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	UpdateDriverStatus(ctx context.Context, in *DriverStatusRequest, opts ...grpc.CallOption) (*DriverStatusResponse, error)
+	GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverList, error)
+	UpdateDriverStatus(ctx context.Context, in *DriverStatusUpdate, opts ...grpc.CallOption) (*DriverResponse, error)
 }
 
 type driverServiceClient struct {
@@ -39,9 +39,9 @@ func NewDriverServiceClient(cc grpc.ClientConnInterface) DriverServiceClient {
 	return &driverServiceClient{cc}
 }
 
-func (c *driverServiceClient) GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
+func (c *driverServiceClient) GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DriverResponse)
+	out := new(DriverList)
 	err := c.cc.Invoke(ctx, DriverService_GetAvailableDrivers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -49,9 +49,9 @@ func (c *driverServiceClient) GetAvailableDrivers(ctx context.Context, in *Drive
 	return out, nil
 }
 
-func (c *driverServiceClient) UpdateDriverStatus(ctx context.Context, in *DriverStatusRequest, opts ...grpc.CallOption) (*DriverStatusResponse, error) {
+func (c *driverServiceClient) UpdateDriverStatus(ctx context.Context, in *DriverStatusUpdate, opts ...grpc.CallOption) (*DriverResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DriverStatusResponse)
+	out := new(DriverResponse)
 	err := c.cc.Invoke(ctx, DriverService_UpdateDriverStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +63,8 @@ func (c *driverServiceClient) UpdateDriverStatus(ctx context.Context, in *Driver
 // All implementations must embed UnimplementedDriverServiceServer
 // for forward compatibility.
 type DriverServiceServer interface {
-	GetAvailableDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
-	UpdateDriverStatus(context.Context, *DriverStatusRequest) (*DriverStatusResponse, error)
+	GetAvailableDrivers(context.Context, *DriverRequest) (*DriverList, error)
+	UpdateDriverStatus(context.Context, *DriverStatusUpdate) (*DriverResponse, error)
 	mustEmbedUnimplementedDriverServiceServer()
 }
 
@@ -75,10 +75,10 @@ type DriverServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDriverServiceServer struct{}
 
-func (UnimplementedDriverServiceServer) GetAvailableDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
+func (UnimplementedDriverServiceServer) GetAvailableDrivers(context.Context, *DriverRequest) (*DriverList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableDrivers not implemented")
 }
-func (UnimplementedDriverServiceServer) UpdateDriverStatus(context.Context, *DriverStatusRequest) (*DriverStatusResponse, error) {
+func (UnimplementedDriverServiceServer) UpdateDriverStatus(context.Context, *DriverStatusUpdate) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateDriverStatus not implemented")
 }
 func (UnimplementedDriverServiceServer) mustEmbedUnimplementedDriverServiceServer() {}
@@ -121,7 +121,7 @@ func _DriverService_GetAvailableDrivers_Handler(srv interface{}, ctx context.Con
 }
 
 func _DriverService_UpdateDriverStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DriverStatusRequest)
+	in := new(DriverStatusUpdate)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func _DriverService_UpdateDriverStatus_Handler(srv interface{}, ctx context.Cont
 		FullMethod: DriverService_UpdateDriverStatus_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DriverServiceServer).UpdateDriverStatus(ctx, req.(*DriverStatusRequest))
+		return srv.(DriverServiceServer).UpdateDriverStatus(ctx, req.(*DriverStatusUpdate))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -155,5 +155,5 @@ var DriverService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "driver.proto",
+	Metadata: "proto/driver.proto",
 }
