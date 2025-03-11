@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PassengerService_RequestRide_FullMethodName = "/passenger.PassengerService/RequestRide"
+	PassengerService_RequestRide_FullMethodName           = "/passenger.PassengerService/RequestRide"
+	PassengerService_UpdatePassengerStatus_FullMethodName = "/passenger.PassengerService/UpdatePassengerStatus"
 )
 
 // PassengerServiceClient is the client API for PassengerService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PassengerServiceClient interface {
-	RequestRide(ctx context.Context, in *PassengerRideRequest, opts ...grpc.CallOption) (*RideResponse, error)
+	RequestRide(ctx context.Context, in *PassengerRequest, opts ...grpc.CallOption) (*PassengerResponse, error)
+	UpdatePassengerStatus(ctx context.Context, in *PassengerStatusUpdate, opts ...grpc.CallOption) (*PassengerResponse, error)
 }
 
 type passengerServiceClient struct {
@@ -37,10 +39,20 @@ func NewPassengerServiceClient(cc grpc.ClientConnInterface) PassengerServiceClie
 	return &passengerServiceClient{cc}
 }
 
-func (c *passengerServiceClient) RequestRide(ctx context.Context, in *PassengerRideRequest, opts ...grpc.CallOption) (*RideResponse, error) {
+func (c *passengerServiceClient) RequestRide(ctx context.Context, in *PassengerRequest, opts ...grpc.CallOption) (*PassengerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RideResponse)
+	out := new(PassengerResponse)
 	err := c.cc.Invoke(ctx, PassengerService_RequestRide_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *passengerServiceClient) UpdatePassengerStatus(ctx context.Context, in *PassengerStatusUpdate, opts ...grpc.CallOption) (*PassengerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PassengerResponse)
+	err := c.cc.Invoke(ctx, PassengerService_UpdatePassengerStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +63,8 @@ func (c *passengerServiceClient) RequestRide(ctx context.Context, in *PassengerR
 // All implementations must embed UnimplementedPassengerServiceServer
 // for forward compatibility.
 type PassengerServiceServer interface {
-	RequestRide(context.Context, *PassengerRideRequest) (*RideResponse, error)
+	RequestRide(context.Context, *PassengerRequest) (*PassengerResponse, error)
+	UpdatePassengerStatus(context.Context, *PassengerStatusUpdate) (*PassengerResponse, error)
 	mustEmbedUnimplementedPassengerServiceServer()
 }
 
@@ -62,8 +75,11 @@ type PassengerServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPassengerServiceServer struct{}
 
-func (UnimplementedPassengerServiceServer) RequestRide(context.Context, *PassengerRideRequest) (*RideResponse, error) {
+func (UnimplementedPassengerServiceServer) RequestRide(context.Context, *PassengerRequest) (*PassengerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RequestRide not implemented")
+}
+func (UnimplementedPassengerServiceServer) UpdatePassengerStatus(context.Context, *PassengerStatusUpdate) (*PassengerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdatePassengerStatus not implemented")
 }
 func (UnimplementedPassengerServiceServer) mustEmbedUnimplementedPassengerServiceServer() {}
 func (UnimplementedPassengerServiceServer) testEmbeddedByValue()                          {}
@@ -87,7 +103,7 @@ func RegisterPassengerServiceServer(s grpc.ServiceRegistrar, srv PassengerServic
 }
 
 func _PassengerService_RequestRide_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PassengerRideRequest)
+	in := new(PassengerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -99,7 +115,25 @@ func _PassengerService_RequestRide_Handler(srv interface{}, ctx context.Context,
 		FullMethod: PassengerService_RequestRide_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PassengerServiceServer).RequestRide(ctx, req.(*PassengerRideRequest))
+		return srv.(PassengerServiceServer).RequestRide(ctx, req.(*PassengerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PassengerService_UpdatePassengerStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PassengerStatusUpdate)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PassengerServiceServer).UpdatePassengerStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PassengerService_UpdatePassengerStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PassengerServiceServer).UpdatePassengerStatus(ctx, req.(*PassengerStatusUpdate))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -114,6 +148,10 @@ var PassengerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RequestRide",
 			Handler:    _PassengerService_RequestRide_Handler,
+		},
+		{
+			MethodName: "UpdatePassengerStatus",
+			Handler:    _PassengerService_UpdatePassengerStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

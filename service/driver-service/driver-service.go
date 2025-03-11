@@ -2,27 +2,41 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	pb "example.com/uber/Go-microservices/proto/driver"
 )
 
 type DriverServiceServer struct {
 	pb.UnimplementedDriverServiceServer
+	DriverModel *DriverModel
 }
 
-func (s *DriverServiceServer) GetAvailableDrivers(ctx context.Context, req *pb.DriverRequest) (*pb.DriverList, error) {
-	log.Printf("Finding available drivers near: %s", req.Location)
+func NewDriverService(dm *DriverModel) *DriverServiceServer {
+	return &DriverServiceServer{DriverModel: dm}
+}
 
-	drivers := []*pb.Driver{
-		{Id: "D1", Name: "John Doe", Status: "Available"},
-		{Id: "D2", Name: "Alice Smith", Status: "Available"},
+func (s *DriverServiceServer) GetAvailableDrivers(ctx context.Context, req *pb.DriverRequest) (*pb.DriverResponse, error) {
+	drivers, err := s.DriverModel.GetAvailableDrivers()
+	if err != nil {
+		return nil, err
 	}
 
-	return &pb.DriverList{Drivers: drivers}, nil
+	var driverList []*pb.Driver
+	for _, d := range drivers {
+		driverList = append(driverList, &pb.Driver{
+			DriverId: d.DriverID,
+			Status:   d.Status,
+		})
+	}
+
+	return &pb.DriverResponse{Drivers: driverList}, nil
 }
 
 func (s *DriverServiceServer) UpdateDriverStatus(ctx context.Context, req *pb.DriverStatusUpdate) (*pb.DriverResponse, error) {
-	log.Printf("Updating driver %s status to %s", req.DriverId, req.Status)
+	err := s.DriverModel.UpdateDriverStatus(req.DriverId, req.Status)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update driver status: %v", err)
+	}
 	return &pb.DriverResponse{Success: true}, nil
 }

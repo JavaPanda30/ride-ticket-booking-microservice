@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package ride;
 
-option go_package = "Go-microservices/proto/ride";
+option go_package = "./Go-microservices/proto/ride";
 
 service RideService {
     rpc CreateRide (RideRequest) returns (RideResponse);
@@ -12,14 +12,17 @@ service RideService {
 message RideRequest {
     string passenger_id = 1;
     string pickup_location = 2;
+    string drop_location = 3;
+}
+
+message RideResponse {
+    string ride_id = 1;
+    string status = 2;
+    string driver_id = 3;
+    bool success = 4;
 }
 
 message RideStatusUpdate {
     string ride_id = 1;
     string status = 2;
-}
-
-message RideResponse {
-    string ride_id = 1;
-    bool success = 2;
 }

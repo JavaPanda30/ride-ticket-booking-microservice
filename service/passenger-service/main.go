@@ -11,16 +11,19 @@ import (
 )
 
 func main() {
-	listener, err := net.Listen("tcp", ":50053")
+	fmt.Println("Starting Passenger Service...")
+
+	listener, err := net.Listen("tcp", ":50052")
 	if err != nil {
-		log.Fatalf("Failed to listen on port 50053: %v", err)
+		log.Fatalf("Failed to listen: %v", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	pb.RegisterPassengerServiceServer(grpcServer, &PassengerServiceServer{})
+	server := grpc.NewServer()
+	passengerService := NewPassengerServiceServer()
+	pb.RegisterPassengerServiceServer(server, passengerService)
 
-	fmt.Println("Passenger Service is running on port 50053...")
-	if err := grpcServer.Serve(listener); err != nil {
+	fmt.Println("Passenger Service running on port 50052...")
+	if err := server.Serve(listener); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
 }

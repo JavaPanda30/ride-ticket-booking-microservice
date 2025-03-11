@@ -5,22 +5,34 @@ import (
 	"log"
 	"net"
 
+	"example.com/uber/db"
 	pb "example.com/uber/Go-microservices/proto/driver"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
-	listener, err := net.Listen("tcp", ":50051")
+	fmt.Println("Starting Driver Service...")
+
+	DB, err := db.ConnectDB()
 	if err != nil {
-		log.Fatalf("Failed to listen on port 50051: %v", err)
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
+	defer DB.Close()
+
+	driverModel := NewDriverModel(DB)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterDriverServiceServer(grpcServer, &DriverServiceServer{})
+	driverService := NewDriverService(driverModel)
+	pb.RegisterDriverServiceServer(grpcServer, driverService)
 
-	fmt.Println("Driver Service is running on port 50051...")
+	listener, err := net.Listen("tcp", ":50051")
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+	}
+
+	fmt.Println("Driver Service is running on port 50051")
 	if err := grpcServer.Serve(listener); err != nil {
-		log.Fatalf("Failed to serve: %v", err)
+		log.Fatalf("Failed to serve gRPC server: %v", err)
 	}
 }

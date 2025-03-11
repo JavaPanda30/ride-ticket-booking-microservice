@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 
 	pb "example.com/uber/Go-microservices/proto/ride"
 )
@@ -12,11 +11,32 @@ type RideServiceServer struct {
 }
 
 func (s *RideServiceServer) CreateRide(ctx context.Context, req *pb.RideRequest) (*pb.RideResponse, error) {
-	log.Printf("Creating ride for passenger %s at location %s", req.PassengerId, req.PickupLocation)
-	return &pb.RideResponse{RideId: "R12345", Success: true}, nil
+	ride, err := CreateRide(req.PassengerId, req.PickupLocation, req.DropLocation)
+	if err != nil {
+		return nil, err
+	}
+	driverID := "driver_123"
+	if err := UpdateRideStatus(ride.RideID, "assigned"); err != nil {
+		return nil, err
+	}
+
+	return &pb.RideResponse{
+		RideId:   ride.RideID,
+		Status:   "assigned",
+		DriverId: driverID,
+		Success:  true,
+	}, nil
 }
 
 func (s *RideServiceServer) UpdateRideStatus(ctx context.Context, req *pb.RideStatusUpdate) (*pb.RideResponse, error) {
-	log.Printf("Updating ride %s status to %s", req.RideId, req.Status)
-	return &pb.RideResponse{RideId: req.RideId, Success: true}, nil
+	err := UpdateRideStatus(req.RideId, req.Status)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.RideResponse{
+		RideId:  req.RideId,
+		Status:  req.Status,
+		Success: true,
+	}, nil
 }

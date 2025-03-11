@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package driver;
 
-option go_package = "Go-microservices/proto/driver";
+option go_package = "./Go-microservices/proto/driver";
 
 service DriverService {
-    rpc GetAvailableDrivers (DriverRequest) returns (DriverList);
+    rpc GetAvailableDrivers (DriverRequest) returns (DriverResponse);
     rpc UpdateDriverStatus (DriverStatusUpdate) returns (DriverResponse);
 }
 
@@ -13,21 +13,17 @@ message DriverRequest {
     string location = 1;
 }
 
-message Driver {
-    string id = 1;
-    string name = 2;
-    string status = 3;
+message DriverResponse {
+    repeated Driver drivers = 1;
+    bool success = 2;
 }
 
-message DriverList {
-    repeated Driver drivers = 1;
+message Driver {
+    string driver_id = 1;
+    string status = 2;
 }
 
 message DriverStatusUpdate {
     string driver_id = 1;
     string status = 2;
-}
-
-message DriverResponse {
-    bool success = 1;
 }

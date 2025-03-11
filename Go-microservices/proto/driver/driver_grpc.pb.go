@@ -27,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DriverServiceClient interface {
-	GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverList, error)
+	GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
 	UpdateDriverStatus(ctx context.Context, in *DriverStatusUpdate, opts ...grpc.CallOption) (*DriverResponse, error)
 }
 
@@ -39,9 +39,9 @@ func NewDriverServiceClient(cc grpc.ClientConnInterface) DriverServiceClient {
 	return &driverServiceClient{cc}
 }
 
-func (c *driverServiceClient) GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverList, error) {
+func (c *driverServiceClient) GetAvailableDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DriverList)
+	out := new(DriverResponse)
 	err := c.cc.Invoke(ctx, DriverService_GetAvailableDrivers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (c *driverServiceClient) UpdateDriverStatus(ctx context.Context, in *Driver
 // All implementations must embed UnimplementedDriverServiceServer
 // for forward compatibility.
 type DriverServiceServer interface {
-	GetAvailableDrivers(context.Context, *DriverRequest) (*DriverList, error)
+	GetAvailableDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
 	UpdateDriverStatus(context.Context, *DriverStatusUpdate) (*DriverResponse, error)
 	mustEmbedUnimplementedDriverServiceServer()
 }
@@ -75,7 +75,7 @@ type DriverServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDriverServiceServer struct{}
 
-func (UnimplementedDriverServiceServer) GetAvailableDrivers(context.Context, *DriverRequest) (*DriverList, error) {
+func (UnimplementedDriverServiceServer) GetAvailableDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableDrivers not implemented")
 }
 func (UnimplementedDriverServiceServer) UpdateDriverStatus(context.Context, *DriverStatusUpdate) (*DriverResponse, error) {
